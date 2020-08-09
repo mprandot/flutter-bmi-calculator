@@ -14,6 +14,42 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  String infoText = "Please, insert your weight and height";
+
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+
+  void resetFields () {
+    weightController.text = "";
+    heightController.text = "";
+    setState(() {
+      infoText = "Please, insert weight and height";
+    });
+  }
+
+  void calculate() {
+    setState(() {
+      double weight = double.parse(weightController.text);
+      double height = double.parse(heightController.text) / 100;
+      double imc = weight / (height * height);
+
+      if ( imc < 19.5 ){
+        infoText = "You are underweight";
+      }
+      if (imc >= 19.5 && imc < 26.4){
+        infoText = "You are at the ideal weight";
+      }
+      if (imc >= 26.4  && imc < 31) {
+        infoText = "Are you overweight";
+      }
+      if (imc >= 31 ) {
+        infoText = "You are obese";
+      }
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,9 +61,7 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               icon: Icon(Icons.refresh),
-              onPressed: (){
-                print("oi'");
-              }
+              onPressed: resetFields
             )
           ],
         ),
@@ -40,9 +74,10 @@ class _HomeState extends State<Home> {
               Icon(Icons.person_outline, size: 120.0, color: Colors.green),
 
               TextField(
+                controller: weightController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "Weight",
+                  labelText: "Weight (kg)",
                   labelStyle:  TextStyle(color: Colors.green)
                 ),
                 textAlign: TextAlign.center,
@@ -50,9 +85,10 @@ class _HomeState extends State<Home> {
               ),
 
               TextField(
+                controller: heightController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "Height(cm)",
+                  labelText: "Height (cm)",
                   labelStyle:  TextStyle(color: Colors.green)
                 ),
                 textAlign: TextAlign.center,
@@ -66,14 +102,14 @@ class _HomeState extends State<Home> {
                   height: 50.0,
                   child: RaisedButton(
                     color: Colors.green,
-                    onPressed: () {},
+                    onPressed: calculate,
                     child: Text("Calculate", style: TextStyle(color: Colors.white, fontSize: 25.0)),
                   ),
                 ),
               ),
 
               Text(
-                "Info", 
+                infoText, 
                 textAlign: TextAlign.center, 
                 style: TextStyle(color: Colors.green, fontSize: 25.0)
               )
