@@ -20,11 +20,13 @@ class _HomeState extends State<Home> {
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
 
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   void resetFields () {
     weightController.text = "";
     heightController.text = "";
     setState(() {
       infoText = "Please, insert weight and height";
+      formKey = GlobalKey<FormState>();
     });
   }
 
@@ -35,19 +37,18 @@ class _HomeState extends State<Home> {
       double imc = weight / (height * height);
 
       if ( imc < 19.5 ){
-        infoText = "You are underweight";
+        infoText = "You are underweight (${imc.toStringAsPrecision(3)})";
       }
       if (imc >= 19.5 && imc < 26.4){
-        infoText = "You are at the ideal weight";
+        infoText = "You are at the ideal weight (${imc.toStringAsPrecision(3)})";
       }
       if (imc >= 26.4  && imc < 31) {
-        infoText = "Are you overweight";
+        infoText = "Are you overweight (${imc.toStringAsPrecision(3)})";
       }
       if (imc >= 31 ) {
-        infoText = "You are obese";
+        infoText = "You are obese (${imc.toStringAsPrecision(3)})";
       }
     });
-
   }
 
   @override
@@ -68,52 +69,71 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Icon(Icons.person_outline, size: 120.0, color: Colors.green),
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Icon(Icons.person_outline, size: 120.0, color: Colors.green),
 
-              TextField(
-                controller: weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Weight (kg)",
-                  labelStyle:  TextStyle(color: Colors.green)
+                TextFormField(
+                  controller: weightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Weight (kg)",
+                    labelStyle:  TextStyle(color: Colors.green)
+                  ),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.green, fontSize: 25.0),
+                  // ignore: missing_return
+                  validator: (value) {
+                    if (value.isEmpty){
+                      return "Insert your weight";
+                    }
+                  },
                 ),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.green, fontSize: 25.0),
-              ),
 
-              TextField(
-                controller: heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Height (cm)",
-                  labelStyle:  TextStyle(color: Colors.green)
+                TextFormField(
+                  controller: heightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Height (cm)",
+                    labelStyle:  TextStyle(color: Colors.green)
+                  ),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.green, fontSize: 25.0),
+                  // ignore: missing_return
+                  validator: (value) {
+                    if (value.isEmpty){
+                      return "Insert your height";
+                    }
+                  }
                 ),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.green, fontSize: 25.0),
-              ),
 
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: 
-                Container(
-                  height: 50.0,
-                  child: RaisedButton(
-                    color: Colors.green,
-                    onPressed: calculate,
-                    child: Text("Calculate", style: TextStyle(color: Colors.white, fontSize: 25.0)),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                  child:
+                  Container(
+                    height: 50.0,
+                    child: RaisedButton(
+                      color: Colors.green,
+                      onPressed: () {
+                        if(formKey.currentState.validate()){
+                          calculate();
+                        }
+                      },
+                      child: Text("Calculate", style: TextStyle(color: Colors.white, fontSize: 25.0)),
+                    ),
                   ),
                 ),
-              ),
 
-              Text(
-                infoText, 
-                textAlign: TextAlign.center, 
-                style: TextStyle(color: Colors.green, fontSize: 25.0)
-              )
-            ],
+                Text(
+                  infoText,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.green, fontSize: 25.0)
+                )
+              ],
+            ),
           ),
         ) 
       ),
